@@ -1,0 +1,134 @@
+.publish-container {
+  padding: 20px;
+}
+
+.title-input {
+  font-size: 30px;
+  min-height: 80px;
+  border: skyblue solid 1px;
+  border-radius: 20px;
+  padding: 10px;
+  width: 80%;
+  margin: 50px auto 50px;
+}
+
+.content-input {
+  min-height: 350px;
+  border-radius: 20px;
+  padding: 10px;
+  width: 80%;
+  font-size: 30px;
+  border: skyblue solid 1px;
+  margin: 0 auto 20px;
+}
+
+.preview-media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.media-item {
+  position: relative;
+  // 增大宽度
+  width: 150px;
+  // 增大高度
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+}
+
+.preview-image,
+.preview-video {
+  // 确保图片和视频填充整个容器
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.upload-media-image {
+  // 增大宽度
+  width: 250px;
+  // 增大高度
+  height: 250px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  // border: 1px dashed #ccc;
+  border-radius: 8px;
+}
+
+.position-icon {
+  // 增大宽度
+  width: 136px;
+  // 增大高度
+  height: 136px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.delete-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 16px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.topic-location-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.publish-item {
+  flex: 1;
+}
+
+.picker {
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.position-icon {
+  // 增大宽度
+  width: 40px;
+  // 增大高度
+  height: 40px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.submit-button {
+  margin-top: 20px;
+  background-color: skyblue;
+  color: white;
+  border-radius: 30px;
+  font-size: 30px;
+  padding: 16px 0;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.upload-title {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 10px;
+  color: #333;
+}

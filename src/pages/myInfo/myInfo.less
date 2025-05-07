@@ -1,0 +1,51 @@
+.my-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  width: 100%; // 设置容器宽度为整个屏幕宽度
+  box-sizing: border-box; // 确保内边距和边框包含在宽度内
+}
+
+.avatar-container {
+  margin-bottom: 20px;
+}
+
+.username-container {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.avatar-section,
+.username-section {
+  padding: 15px;
+  background-color: #ffffff; // 设置块的背景颜色
+  margin-bottom: 10px; // 块之间的间距
+  border-bottom: 1px solid #e0e0e0; // 添加底边框
+  width: 100%; // 设置块的宽度为整个屏幕宽度
+  box-sizing: border-box; // 确保内边距和边框包含在宽度内
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.avatar-section .label,
+.username-section .label {
+  font-weight: bold; // 标签文字加粗
+}
+
+.avatar-section .avatar-image {
+  margin-left: 0;
+}
+
+.avatar-image {
+  width: 60px; // 适当缩小宽度
+  height: 60px; // 适当缩小高度
+  border-radius: 50%; // 设置为圆形
+  object-fit: cover; // 确保图片覆盖整个圆形区域
+}
+
+.username-section .value {
+  height: 60px; // 让昵称高度与头像高度一致
+  line-height: 60px; // 垂直居中昵称文字
+}
