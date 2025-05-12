@@ -1,25 +1,138 @@
+.body {
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.top {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 30rpx 35rpx;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 5rpx solid #f3f3f3;
+}
+
+.top .publish-btn {
+  margin: 0 !important;
+  background-color: #259feb;
+  color: #fff;
+  border-radius: 40rpx;
+  width: 150rpx;
+}
+
+.container {
+  padding: 30rpx 35rpx 50rpx 35rpx;
+}
+
+.input-list {
+  padding: 30rpx 15rpx;
+  padding-top: 80rpx;
+}
+
+.input-list .input-item {
+  margin-bottom: 20px;
+  border: 1px solid #cccccc;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.input-list .input-item:first-child {
+  margin-bottom: 20px;
+}
+
+.input-list .input-item input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 18px;
+  background: transparent;
+}
+
+.input-list .input-item textarea,
+.input-list .input-item .taro-textarea__textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  resize: none;
+}
+
+.upload-video {
+  margin: 30px 0 10px 0;
+}
+
+.upload {
+  padding-top: 20rpx;
+}
+
+.upload .upload-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upload .upload-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20rpx;
+}
+
+.upload .upload-list .default {
+  width: 120px;
+  height: 120px;
+}
+
+.img-list {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  margin-right: 12px;
+  margin-bottom: 12px;
+}
+
+.img-list .common {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
+
+.img-list .delete {
+  width: 28px;
+  height: 28px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.error-tips {
+  color: #f00;
+  font-size: 26rpx;
+}
+
 .publish-container {
   padding: 20px;
+  background: #fff;
 }
 
 .title-input {
-  font-size: 30px;
-  min-height: 80px;
-  border: skyblue solid 1px;
-  border-radius: 20px;
-  padding: 10px;
-  width: 80%;
-  margin: 50px auto 50px;
+  font-size: 20px;
+  color: #bbb;
+  margin-bottom: 10px;
+  border: none;
+  background: none;
 }
 
 .content-input {
-  min-height: 350px;
-  border-radius: 20px;
-  padding: 10px;
-  width: 80%;
-  font-size: 30px;
-  border: skyblue solid 1px;
-  margin: 0 auto 20px;
+  font-size: 16px;
+  color: #bbb;
+  margin-bottom: 20px;
+  border: none;
+  background: none;
+  min-height: 60px;
 }
 
 .preview-media {
@@ -63,9 +176,9 @@
 
 .position-icon {
   // 增大宽度
-  width: 136px;
+  width: 40px;
   // 增大高度
-  height: 136px;
+  height: 40px;
   margin-right: 8px;
   vertical-align: middle;
 }
@@ -105,25 +218,103 @@
   align-items: center;
 }
 
-.position-icon {
-  // 增大宽度
-  width: 40px;
-  // 增大高度
-  height: 40px;
-  margin-right: 8px;
-  vertical-align: middle;
+.location-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  .icon-location {
+    margin-right: 6px;
+  }
+  .location-list {
+    display: flex;
+    margin-left: 10px;
+    .location-item {
+      background: #f5f5f5;
+      border-radius: 16px;
+      padding: 4px 12px;
+      margin-right: 8px;
+      cursor: pointer;
+    }
+    .selected {
+      background: #ffeaea;
+      color: #ff2442;
+    }
+  }
 }
 
-.submit-button {
-  margin-top: 20px;
-  background-color: skyblue;
-  color: white;
-  border-radius: 30px;
-  font-size: 30px;
-  padding: 16px 0;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
+.visible-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  .icon-lock {
+    margin-right: 6px;
+  }
+  .arrow {
+    margin-left: auto;
+    color: #bbb;
+  }
+}
+
+.bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+  .draft-btn,
+  .preview-btn {
+    font-size: 14px;
+    color: #888;
+    margin-right: 10px;
+  }
+  .publish-btn {
+    flex: 1;
+    background: #ff2442;
+    color: #fff;
+    border-radius: 24px;
+    font-size: 18px;
+    height: 44px;
+  }
+}
+
+.img-upload-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  .img-thumb-wrap {
+    position: relative;
+    margin-right: 10px;
+  }
+  .img-thumb {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #fafafa;
+    border: 1px solid #eee;
+    display: block;
+  }
+  .add-img-btn {
+    background: #fafafa;
+    border: 1.5px dashed #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .img-delete {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff2442;
+    color: #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    font-size: 16px;
+    z-index: 2;
+  }
 }
 
 .upload-title {

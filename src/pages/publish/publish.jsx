@@ -5,205 +5,152 @@ import {
   Button,
   Image,
   Video,
-  Picker,
+  Textarea,
 } from "@tarojs/components";
 import { useState } from "react";
 import Taro from "@tarojs/taro";
+import uploadIcon from "../../assets/images/upload.png";
+import closeIcon from "../../assets/images/close1.png";
 import "./publish.less";
-import addImg from "../../assets/images/add.png";
-import pubPicture from "../../assets/images/upload.png";
-import positionImg from "../../assets/images/position.png"; // 引入位置图片
 
 export default function Publish() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [images, setImages] = useState([]);
-  const [videos, setVideos] = useState([]);
-  const [topic, setTopic] = useState("");
-  const [location, setLocation] = useState("");
+  const [imgList, setImgList] = useState([]);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
-
-  const handleContentChange = (e) => {
-    setContent(e.target.value);
-  };
-
-  const handleMediaUpload = async () => {
-    try {
-      const res = await Taro.chooseMedia({
-        count: 3 - (images.length + videos.length),
-        mediaType: ["image", "video"],
-      });
-      if (res.errMsg === 'chooseMedia:ok') {
-        console.log("选择的媒体文件:", res.tempFiles);
-  
-        const newImages = [...images];
-        const newVideos = [...videos];
-  
-        res.tempFiles.forEach((file) => {
-          const filePath = file.tempFilePath || file.path; // ✅ 兼容路径
-          if (file.fileType === "image") {
-            console.log("即将添加的图片路径:", filePath);
-            newImages.push(filePath);
-          } else if (file.fileType === "video") {
-            if (newVideos.length === 0) {
-              newVideos.push(filePath);
-            } else {
-              Taro.showToast({
-                title: "只能上传一个视频",
-                icon: "none",
-              });
-            }
-          }
+  // 上传图片
+  const uploadImg = async () => {
+    const res = await Taro.chooseImage({
+      count: 9 - imgList.length,
+      sizeType: ["original", "compressed"],
+      sourceType: ["album", "camera"],
+    });
+    if (res.tempFilePaths) {
+      for (let tempFilePath of res.tempFilePaths) {
+        const uploadRes = await Taro.uploadFile({
+          url: 'http://127.0.0.1:3001/uploadImg',
+          filePath: tempFilePath,
+          name: 'file',
         });
-  
-        setImages(newImages);
-        setVideos(newVideos);
-  
-        console.log("更新后的图片状态:", newImages);
-        console.log("更新后的视频状态:", newVideos);
-      }
-    } catch (error) {
-      if (error.errMsg !== 'chooseMedia:fail cancel') {
-        console.error("选择媒体出错:", error);
-        Taro.showToast({
-          title: "选择媒体出错",
-          icon: "none",
-        });
+        const data = JSON.parse(uploadRes.data);
+        setImgList(list => list.concat(data));
       }
     }
   };
 
-  const handleRemoveImage = (index) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setImages(newImages);
+  // 删除图片
+  const deleteImg = (idx) => {
+    const newList = [...imgList];
+    newList.splice(idx, 1);
+    setImgList(newList);
   };
 
-  const handleRemoveVideo = (index) => {
-    const newVideos = [...videos];
-    newVideos.splice(index, 1);
-    setVideos(newVideos);
-  };
-
-  const topicRange = ["#旅行", "#美食", "#生活", "#时尚"];
-
-  const handleTopicChange = (e) => {
-    const index = e.detail.value;
-    const selectedTopic = topicRange[index];
-    setTopic(selectedTopic);
-  };
-
-  const locationRange = ["北京", "上海", "广州", "深圳"];
-
-  const handleLocationChange = (e) => {
-    const index = e.detail.value;
-    const selectedLocation = locationRange[index];
-    setLocation(selectedLocation);
-  };
-
-  const handleSubmit = () => {
-    console.log("标题:", title);
-    console.log("内容:", content);
-    console.log("图片:", images);
-    console.log("视频:", videos);
-    console.log("话题:", topic);
-    console.log("位置:", location);
-    Taro.showToast({
-      title: "发布成功",
-      icon: "success",
+  // 上传视频
+  const uploadVideo = async () => {
+    const res = await Taro.chooseVideo({
+      sourceType: ["album", "camera"],
     });
+    if (res.tempFilePath) {
+      const uploadRes = await Taro.uploadFile({
+        url: 'http://127.0.0.1:3001/uploadVideo',
+        filePath: res.tempFilePath,
+        name: 'video',
+      });
+      const data = JSON.parse(uploadRes.data);
+      if (data && data.path) setVideoUrl(data.path);
+    }
+  };
+
+  // 删除视频
+  const deleteVideo = () => setVideoUrl("");
+
+  // 发布
+  const toPublish = async () => {
+    if (!title) {
+      Taro.showToast({ title: '请填写标题', icon: 'none' });
+      return;
+    }
+    if (title.length > 10) {
+      Taro.showToast({ title: '标题长度小于等于10个字符', icon: 'none' });
+      return;
+    }
+    if (!content) {
+      Taro.showToast({ title: '请填写游记内容', icon: 'none' });
+      return;
+    }
+    if (imgList.length === 0) {
+      Taro.showToast({ title: '请至少上传一张图片', icon: 'none' });
+      return;
+    }
+    setLoading(true);
+    const params = {
+      openid: Taro.getStorageSync('userInfo')._id,
+      title,
+      content,
+      imgList,
+      videoUrl,
+      time: Date.now(),
+    };
+    const res = await Taro.request({
+      url: 'http://127.0.0.1:3001/publishTravelNote',
+      method: 'POST',
+      data: params,
+    });
+    setLoading(false);
+    if (res.data && res.data.message === 'Success') {
+      Taro.showToast({ title: '发布成功!', icon: 'none' });
+      setTimeout(() => {
+        Taro.redirectTo({ url: '/pages/myPosts/myPosts' });
+      }, 1000);
+    } else {
+      Taro.showToast({ title: '操作失败!', icon: 'none' });
+    }
   };
 
   return (
-    <View className="publish-container">
-      <View className="publish-item">
-        <Input
-          className="title-input"
-          placeholder="请输入标题（最多20字）"
-          value={title}
-          onInput={handleTitleChange}
-          maxLength={20}
-        />
-        <Input
-          className="content-input"
-          placeholder="分享你的精彩瞬间..."
-          value={content}
-          onInput={handleContentChange}
-          multiline
-        />
+    <View className="body">
+      <View className="top">
+        {/* <Text onClick={() => Taro.navigateBack()}>返回</Text> */}
+        <Button className="publish-btn" size="mini" onClick={toPublish} loading={loading}>发布</Button>
       </View>
-
-      {/* 添加图片上传标题 */}
-      <Text className="upload-title">图片/视频上传</Text>
-      <View className="publish-item">
-        <View className="preview-media">
-          {images.map((image, index) => (
-            <View key={index} className="media-item">
-              <Image src={image} mode="aspectFit" className="preview-image" />
-              <Text
-                className="delete-button"
-                onClick={() => handleRemoveImage(index)}
-              >
-                ×
-              </Text>
+      <View className="container">
+        <View className="input-list">
+          <View className="input-item">
+            <Input value={title} placeholder="请输入游记标题" onInput={e => setTitle(e.detail.value)} />
+          </View>
+          <View className="input-item">
+            <Textarea value={content} placeholder="请输入游记内容" onInput={e => setContent(e.detail.value)} rows={10} />
+          </View>
+        </View>
+        <View className="upload-video">
+          <Button onClick={uploadVideo}>上传视频</Button>
+          {videoUrl && (
+            <View>
+              <Video src={videoUrl} controls />
+              <Image src={closeIcon} className="delete-video" style={{ width: '30px' }} onClick={deleteVideo} />
             </View>
-          ))}
-          <Image
-            src={pubPicture}
-            mode="aspectFit"
-            className="upload-media-image"
-            onClick={handleMediaUpload}
-          />
-          {videos.map((video, index) => (
-            <View key={index} className="media-item">
-              <Video src={video} controls className="preview-video" />
-              <Text
-                className="delete-button"
-                onClick={() => handleRemoveVideo(index)}
-              >
-                ×
-              </Text>
-            </View>
-          ))}
+          )}
+        </View>
+        <View className="upload">
+          <View className="upload-top">
+            <Text>最多选择9张图片</Text>
+            <Text>{imgList.length}/9</Text>
+          </View>
+          <View className="upload-list">
+            {imgList.map((item, idx) => (
+              <View className="img-list" key={idx}>
+                <Image className="common" src={item} />
+                <Image className="delete" src={closeIcon} onClick={() => deleteImg(idx)} />
+              </View>
+            ))}
+            {imgList.length < 9 && (
+              <Image className="default" src={uploadIcon} onClick={uploadImg} />
+            )}
+          </View>
         </View>
       </View>
-
-      <View className="topic-location-container">
-        <View className="publish-item">
-          <Picker
-            mode="selector"
-            range={topicRange}
-            onChange={handleTopicChange}
-          >
-            <View className="picker">
-              <Text>#话题: {topic || "请选择"}</Text>
-            </View>
-          </Picker>
-        </View>
-        <View className="publish-item">
-          <Picker
-            mode="selector"
-            range={["北京", "上海", "广州", "深圳"]}
-            onChange={handleLocationChange}
-          >
-            <View className="picker">
-              <Image
-                src={positionImg}
-                mode="aspectFit"
-                className="position-icon"
-              />
-              <Text>位置: {location || "请选择"}</Text>
-            </View>
-          </Picker>
-        </View>
-      </View>
-
-      <Button className="submit-button" onClick={handleSubmit}>
-        发布笔记
-      </Button>
     </View>
   );
 }

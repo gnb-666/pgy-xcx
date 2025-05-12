@@ -10,52 +10,112 @@ export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
 
   // 登录处理
-  const handleLogin = () => {
-    if (Taro) {
-      if (username === "admin" && password === "admin") {
+  const handleLogin = async () => {
+    if (!username || !password) {
+      Taro.showToast({
+        title: "请输入用户名和密码",
+        icon: "none",
+      });
+      return;
+    }
+
+    try {
+      const res = await Taro.request({
+        url: "http://localhost:3001/toLogin",
+        method: "POST",
+        data: {
+          username,
+          password,
+        },
+      });
+
+      if (res.data === "pwdError") {
+        Taro.showToast({
+          title: "密码错误",
+          icon: "none",
+        });
+      } else if (res.data === "error") {
+        Taro.showToast({
+          title: "用户不存在",
+          icon: "none",
+        });
+      } else {
+        // 登录成功
         Taro.showToast({
           title: "登录成功",
           icon: "success",
         });
+        // 保存用户信息到本地存储
+        Taro.setStorageSync("userInfo", res.data);
         Taro.setStorageSync("isLoggedIn", true);
         Taro.switchTab({ url: "/pages/index/index" });
-      } else {
-        Taro.showToast({
-          title: "账号或密码错误",
-          icon: "none",
-        });
       }
-    } else {
-      console.error("Taro 对象未定义，请检查引入和配置。");
+    } catch (error) {
+      console.error("登录请求失败:", error);
+      Taro.showToast({
+        title: "登录失败，请稍后重试",
+        icon: "none",
+      });
     }
   };
 
   // 注册处理
   const handleRegister = async () => {
-    if (Taro) {
-      if (!username || !password) {
-        Taro.showToast({
-          title: "请输入用户名和密码",
-          icon: "none",
-        });
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        Taro.showToast({
-          title: "两次输入的密码不一致，请重新输入",
-          icon: "none",
-        });
-        return;
-      }
-
+    if (!username || !password) {
       Taro.showToast({
-        title: "注册成功",
-        icon: "success",
+        title: "请输入用户名和密码",
+        icon: "none",
       });
-      setIsLogin(true);
-    } else {
-      console.error("Taro 对象未定义，请检查引入和配置。");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Taro.showToast({
+        title: "两次输入的密码不一致",
+        icon: "none",
+      });
+      return;
+    }
+
+    try {
+      // 生成一个随机的openid
+      const openid = 'user_' + Math.random().toString(36).substr(2, 9);
+      
+      const res = await Taro.request({
+        url: "http://localhost:3001/register",
+        method: "POST",
+        data: {
+          username,
+          password,
+          openid,
+          date: Date.now(), // 使用时间戳数字
+          avatarUrl: "https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0", // 默认头像URL
+        },
+      });
+
+      if (res.data === "用户名不能重复") {
+        Taro.showToast({
+          title: "用户名已存在",
+          icon: "none",
+        });
+      } else if (res.data === "success") {
+        Taro.showToast({
+          title: "注册成功",
+          icon: "success",
+        });
+        setIsLogin(true);
+      } else {
+        Taro.showToast({
+          title: res.data || "注册失败",
+          icon: "none",
+        });
+      }
+    } catch (error) {
+      console.error("注册请求失败:", error);
+      Taro.showToast({
+        title: "注册失败，请稍后重试",
+        icon: "none",
+      });
     }
   };
 
