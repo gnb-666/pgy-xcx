@@ -52,30 +52,30 @@ export default function Login() {
       }
     } catch (error) {
       console.error("登录请求失败:", error);
-      Taro.showToast({
+        Taro.showToast({
         title: "登录失败，请稍后重试",
-        icon: "none",
-      });
+          icon: "none",
+        });
     }
   };
 
   // 注册处理
   const handleRegister = async () => {
-    if (!username || !password) {
-      Taro.showToast({
-        title: "请输入用户名和密码",
-        icon: "none",
-      });
-      return;
-    }
+      if (!username || !password) {
+        Taro.showToast({
+          title: "请输入用户名和密码",
+          icon: "none",
+        });
+        return;
+      }
 
-    if (password !== confirmPassword) {
-      Taro.showToast({
+      if (password !== confirmPassword) {
+        Taro.showToast({
         title: "两次输入的密码不一致",
-        icon: "none",
-      });
-      return;
-    }
+          icon: "none",
+        });
+        return;
+      }
 
     try {
       // 生成一个随机的openid
@@ -99,12 +99,12 @@ export default function Login() {
           icon: "none",
         });
       } else if (res.data === "success") {
-        Taro.showToast({
-          title: "注册成功",
-          icon: "success",
-        });
-        setIsLogin(true);
-      } else {
+      Taro.showToast({
+        title: "注册成功",
+        icon: "success",
+      });
+      setIsLogin(true);
+    } else {
         Taro.showToast({
           title: res.data || "注册失败",
           icon: "none",

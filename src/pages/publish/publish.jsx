@@ -7,7 +7,7 @@ import {
   Video,
   Textarea,
 } from "@tarojs/components";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Taro from "@tarojs/taro";
 import uploadIcon from "../../assets/images/upload.png";
 import closeIcon from "../../assets/images/close1.png";
@@ -19,6 +19,37 @@ export default function Publish() {
   const [imgList, setImgList] = useState([]);
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [info, setInfo] = useState(null);
+
+  useEffect(() => {
+    // 从本地存储获取编辑的游记数据
+    const editData = Taro.getStorageSync('editTravelNote');
+    console.log('获取到的编辑数据:', editData);
+    if (editData) {
+      setInfo(editData);
+      setTitle(editData.title || '');
+      setContent(editData.content || '');
+      setImgList(editData.imgList || []);
+      setVideoUrl(editData.video || editData.videoUrl || '');
+      // 清除本地存储中的数据
+      Taro.removeStorageSync('editTravelNote');
+    }
+  }, []);
+
+  // 页面显示时也检查一次数据
+  Taro.useDidShow(() => {
+    const editData = Taro.getStorageSync('editTravelNote');
+    console.log('页面显示时获取到的编辑数据:', editData);
+    if (editData) {
+      setInfo(editData);
+      setTitle(editData.title || '');
+      setContent(editData.content || '');
+      setImgList(editData.imgList || []);
+      setVideoUrl(editData.video || editData.videoUrl || '');
+      // 清除本地存储中的数据
+      Taro.removeStorageSync('editTravelNote');
+    }
+  });
 
   // 上传图片
   const uploadImg = async () => {
@@ -30,7 +61,7 @@ export default function Publish() {
     if (res.tempFilePaths) {
       for (let tempFilePath of res.tempFilePaths) {
         const uploadRes = await Taro.uploadFile({
-          url: 'http://127.0.0.1:3001/uploadImg',
+          url: 'http://localhost:3001/uploadImg',
           filePath: tempFilePath,
           name: 'file',
         });
@@ -54,7 +85,7 @@ export default function Publish() {
     });
     if (res.tempFilePath) {
       const uploadRes = await Taro.uploadFile({
-        url: 'http://127.0.0.1:3001/uploadVideo',
+        url: 'http://localhost:3001/uploadVideo',
         filePath: res.tempFilePath,
         name: 'video',
       });
@@ -66,54 +97,62 @@ export default function Publish() {
   // 删除视频
   const deleteVideo = () => setVideoUrl("");
 
+  // 返回上一页
+  const backPage = () => {
+    Taro.navigateBack();
+  };
+
   // 发布
-  const toPublish = async () => {
-    if (!title) {
-      Taro.showToast({ title: '请填写标题', icon: 'none' });
-      return;
-    }
-    if (title.length > 10) {
-      Taro.showToast({ title: '标题长度小于等于10个字符', icon: 'none' });
-      return;
-    }
-    if (!content) {
-      Taro.showToast({ title: '请填写游记内容', icon: 'none' });
-      return;
-    }
-    if (imgList.length === 0) {
-      Taro.showToast({ title: '请至少上传一张图片', icon: 'none' });
+  const handlePublish = async () => {
+    if (!title || !content) {
+      Taro.showToast({ title: '标题和内容不能为空!', icon: 'none' });
       return;
     }
     setLoading(true);
-    const params = {
-      openid: Taro.getStorageSync('userInfo')._id,
-      title,
-      content,
-      imgList,
-      videoUrl,
-      time: Date.now(),
-    };
-    const res = await Taro.request({
-      url: 'http://127.0.0.1:3001/publishTravelNote',
-      method: 'POST',
-      data: params,
-    });
-    setLoading(false);
-    if (res.data && res.data.message === 'Success') {
-      Taro.showToast({ title: '发布成功!', icon: 'none' });
-      setTimeout(() => {
-        Taro.redirectTo({ url: '/pages/myPosts/myPosts' });
-      }, 1000);
-    } else {
-      Taro.showToast({ title: '操作失败!', icon: 'none' });
+    try {
+      const userInfo = Taro.getStorageSync('userInfo');
+      const res = await Taro.request({
+        url: 'http://localhost:3001/publishTravelNote',
+        method: 'POST',
+        data: {
+          id: info?._id, // 如果是修改，传入原游记的id
+          title,
+          content,
+          imgList,
+          openid: userInfo._id,
+          videoUrl
+        }
+      });
+      setLoading(false);
+      if (res.data && res.data.message === 'Success') {
+        // 清空所有输入内容
+        setTitle('');
+        setContent('');
+        setImgList([]);
+        setVideoUrl('');
+        setInfo(null);
+        
+        Taro.showToast({ title: info ? '修改成功!' : '发布成功!', icon: 'none' });
+        setTimeout(() => {
+          Taro.switchTab({
+            url: '/pages/myPosts/myPosts'
+          });
+        }, 1000);
+      } else {
+        Taro.showToast({ title: info ? '修改失败!' : '发布失败!', icon: 'none' });
+      }
+    } catch (error) {
+      setLoading(false);
+      Taro.showToast({ title: info ? '修改失败!' : '发布失败!', icon: 'none' });
     }
   };
 
   return (
     <View className="body">
       <View className="top">
-        {/* <Text onClick={() => Taro.navigateBack()}>返回</Text> */}
-        <Button className="publish-btn" size="mini" onClick={toPublish} loading={loading}>发布</Button>
+        <Button className="publish-btn" size="mini" onClick={handlePublish} loading={loading}>
+          {info ? '修改' : '发布'}
+        </Button>
       </View>
       <View className="container">
         <View className="input-list">
