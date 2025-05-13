@@ -42,6 +42,12 @@ export default function Index() {
     }
   };
 
+  const handleToDetail = (item) => {
+    Taro.navigateTo({
+      url: `/pages/infoDetail?_id=${item._id}`
+    });
+  };
+
   return (
     <View>
       <View className="search-container">

@@ -1,20 +1,41 @@
 import { View, Text, Image, Button } from "@tarojs/components";
+import { useState, useEffect } from "react";
 import Taro from "@tarojs/taro";
 import logoutIcon from "../../assets/images/logout.png";
 import basicInfoIcon from "../../assets/images/basicInfo.png";
 import myPostIcon from "../../assets/images/myPost.png"; // 引入图片
-import avatar from "../../assets/images/avatar.png"; // 引入图片
+import avatarDefault from "../../assets/images/avatar.png";
 
 import "./me.less"; // 引入样式文件
 
-// 假设这是从状态管理或者接口获取的用户信息
-const userInfo = {
-  // avatar: "https://example.com/avatar.jpg",
-  avatar: avatar,
-  username: "张三",
-};
-
 export default function Me() {
+  const [userInfo, setUserInfo] = useState({
+    avatar: avatarDefault,
+    username: ""
+  });
+
+  useEffect(() => {
+    // 从本地存储获取用户信息
+    const storedUserInfo = Taro.getStorageSync('userInfo');
+    if (storedUserInfo) {
+      setUserInfo({
+        avatar: storedUserInfo.avatar || avatarDefault,
+        username: storedUserInfo.username || ""
+      });
+    }
+  }, []);
+
+  // 页面显示时也检查一次数据
+  Taro.useDidShow(() => {
+    const storedUserInfo = Taro.getStorageSync('userInfo');
+    if (storedUserInfo) {
+      setUserInfo({
+        avatar: storedUserInfo.avatar || avatarDefault,
+        username: storedUserInfo.username || ""
+      });
+    }
+  });
+
   const handleMyPosts = () => {
     // 跳转到我的发布页面
     Taro.navigateTo({
@@ -31,7 +52,7 @@ export default function Me() {
 
   const handleLogout = () => {
     // 清除登录状态，跳转到登录页面
-    Taro.removeStorageSync("token");
+    Taro.removeStorageSync("userInfo");
     Taro.reLaunch({
       url: "/pages/login/login",
     });
@@ -43,7 +64,12 @@ export default function Me() {
         <View className="avatar-name-container">
           <Image
             src={userInfo.avatar}
-            style={{ width: "100px", height: "100px" }}
+            style={{ 
+              width: "100px", 
+              height: "100px",
+              borderRadius: "50%",
+              objectFit: "cover"
+            }}
           />
           <Text>{userInfo.username}</Text>
         </View>
