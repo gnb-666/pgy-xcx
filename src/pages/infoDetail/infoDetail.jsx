@@ -8,7 +8,9 @@ export default function InfoDetail() {
   const [autoplay] = useState(false);
 
   useEffect(() => {
-    const _id = Taro.getCurrentInstance().router.params._id;
+    const params = Taro.getCurrentInstance().router.params;
+    console.log('获取到的参数:', params);
+    const _id = params._id;
     if (_id) {
       getTravelNoteDetail(_id);
     }
@@ -16,17 +18,19 @@ export default function InfoDetail() {
 
   const getTravelNoteDetail = async (_id) => {
     try {
+      console.log('正在获取游记详情，ID:', _id);
       const result = await Taro.request({
         url: 'http://localhost:3001/getTravelNoteDetail',
         method: 'GET',
         data: { _id }
       });
 
+      console.log('获取到的游记详情:', result.data);
       if (result.data) {
         // 格式化时间
         const formattedInfo = {
           ...result.data,
-          publishTime: formatTimeTwo(result.data.publishTime)
+          publishTime: result.data.publishTime ? formatTimeTwo(result.data.publishTime) : ''
         };
         setInfo(formattedInfo);
       }
@@ -40,13 +44,14 @@ export default function InfoDetail() {
   };
 
   // 格式化时间函数
-  const formatTimeTwo = (date) => {
+  const formatTimeTwo = (dateStr) => {
+    const date = new Date(dateStr);
     const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const hour = date.getHours();
-    const minute = date.getMinutes();
-    const second = date.getSeconds();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    const second = date.getSeconds().toString().padStart(2, '0');
 
     return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   };

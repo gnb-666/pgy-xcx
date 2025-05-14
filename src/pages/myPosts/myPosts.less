@@ -1,105 +1,204 @@
-.myPosts-body {
+.body {
   background: #f7f7f7;
   min-height: 100vh;
-  padding: 0 0 24px 0;
+  padding: 16rpx;
+  padding-bottom: calc(16rpx + 120rpx); /* 为底部按钮留出空间 */
+  box-sizing: border-box;
+  position: relative;
 }
-.myPosts-title {
-  font-weight: bold;
-  font-size: 20px;
-  padding: 20px 0 12px 0;
-  text-align: center;
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
   background: #fff;
+  margin: -16rpx -16rpx 16rpx -16rpx;
 }
-.myPosts-list {
-  padding: 0 0 0 0;
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
 }
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  background: #07c160;
+  color: #fff;
+  font-size: 28rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.add-btn::after {
+  display: none;
+}
+
+.add-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 8rpx;
+}
+
+.lose-list {
+  padding: 0;
+}
+
 .my-card {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #f0f1f2;
-  margin: 20px 16px 0 16px;
-  padding: 0 0 16px 0;
-  overflow: hidden;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+  padding: 20rpx;
+  display: flex;
+  position: relative;
 }
+
 .my-card-img {
-  width: 100%;
-  height: 400px;
-  object-fit: cover;
-  border-radius: 12px 12px 0 0;
-  display: block;
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
 }
+
+.my-card-content-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.my-card-left {
+  flex: 1;
+  margin-right: 20rpx;
+  min-width: 0;
+}
+
 .my-card-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 16px 16px 8px 16px;
+  margin-bottom: 10rpx;
+  gap: 20rpx;
 }
+
 .my-card-title {
+  font-size: 32rpx;
   font-weight: bold;
-  font-size: 20px;
-  flex: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 70%;
 }
+
 .my-card-time {
-  color: #888;
-  font-size: 14px;
-  margin-left: 12px;
+  font-size: 24rpx;
+  color: #999;
   flex-shrink: 0;
+  text-align: right;
+  min-width: 30%;
 }
-.my-card-status {
-  margin-left: 16px;
-  margin-bottom: 8px;
-}
-.status-success {
-  background: #39c06b;
-  color: #fff;
-  border-radius: 16px;
-  padding: 2px 16px;
-  font-size: 16px;
-  display: inline-block;
-}
-.status-fail {
-  background: #ff4d4f;
-  color: #fff;
-  border-radius: 16px;
-  padding: 2px 16px;
-  font-size: 16px;
-  display: inline-block;
-}
-.status-wait {
-  background: #faad14;
-  color: #fff;
-  border-radius: 16px;
-  padding: 2px 16px;
-  font-size: 16px;
-  display: inline-block;
-}
+
 .my-card-content {
+  font-size: 28rpx;
   color: #666;
-  font-size: 16px;
-  margin: 0 16px 16px 16px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
+
+.my-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  width: 120rpx;
+}
+
 .my-card-btns {
   display: flex;
-  justify-content: space-between;
-  padding: 0 16px;
-  gap: 16px;
+  flex-direction: column;
+  gap: 16rpx;
 }
-.btn-edit {
-  background: #39c06b;
+
+.btn-delete, .btn-edit {
+  font-size: 28rpx;
+  padding: 4rpx 0;
+  border: none;
+  background: none;
+  color: #576b95;
+  line-height: 1.5;
+  width: auto !important;
+  height: auto;
+  margin: 0;
+}
+
+.btn-delete::after, .btn-edit::after {
+  display: none;
+}
+
+.my-card-status {
+  position: absolute;
+  left: 20rpx;
+  top: 20rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 4rpx;
+  font-size: 24rpx;
+}
+
+.status-success {
+  background: #07c160;
   color: #fff;
-  border-radius: 24px;
-  flex: 1;
-  font-size: 18px;
-  margin-right: 8px;
 }
-.btn-delete {
-  background: #f5f5f5;
-  color: #ff4d4f;
-  border-radius: 24px;
-  flex: 1;
-  font-size: 18px;
-  margin-left: 8px;
+
+.status-fail {
+  background: #fa5151;
+  color: #fff;
+}
+
+.status-wait {
+  background: #ffc300;
+  color: #fff;
+}
+
+.bottom-space {
+  height: 120rpx; /* 与按钮高度相同，确保最后一个卡片不会被遮挡 */
+  width: 100%;
+}
+
+.fixed-add-btn {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 20rpx 32rpx;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.float-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #07c160;
+  color: #fff;
+  font-size: 32rpx;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  width: 100% !important;
+  border: none;
+}
+
+.float-add-btn::after {
+  display: none;
+}
+
+.float-add-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 12rpx;
 } 
