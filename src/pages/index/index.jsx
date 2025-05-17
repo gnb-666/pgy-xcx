@@ -24,26 +24,35 @@ const formatTime = (time) => {
 
 export default function Index() {
   const [diaries, setDiaries] = useState([]);
-  const [filteredDiaries, setFilteredDiaries] = useState([]);
-  const [categories, setCategories] = useState([
-    { name: '全部', active: true },
-    { name: '游记', active: false },
-    { name: '记录每一天', active: false },
-    { name: '温泉', active: false },
-    { name: '玩雪', active: false },
-    { name: '海边', active: false }
-  ]);
-  const [activeCategory, setActiveCategory] = useState('全部');
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(6);
+  const [pageSize] = useState(10);
   const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // 检查登录态
+  const checkLogin = () => {
+    const userInfo = Taro.getStorageSync('userInfo');
+    if (!userInfo || !userInfo._id) {
+      Taro.showModal({
+        title: '提示',
+        content: '请先登录后使用',
+        confirmText: '去登录',
+        cancelText: '稍后再说',
+        success: function (res) {
+          if (res.confirm) {
+            Taro.navigateTo({
+              url: '/pages/login/index'
+            });
+          }
+        }
+      });
+    }
+  };
 
   // 下拉刷新
   usePullDownRefresh(() => {
-    setPage(1);
     fetchDiaries(1, true);
+    setPage(1);
     setTimeout(() => {
       Taro.stopPullDownRefresh();
     }, 800);
@@ -51,8 +60,15 @@ export default function Index() {
 
   // 首次加载
   useEffect(() => {
+    checkLogin();
     fetchDiaries(1, true);
+    setPage(1);
   }, []);
+
+  // 每次页面显示时也检查登录状态
+  Taro.useDidShow(() => {
+    checkLogin();
+  });
 
   // 加载更多
   useEffect(() => {
@@ -62,17 +78,17 @@ export default function Index() {
     // eslint-disable-next-line
   }, [page]);
 
-  // 获取游记数据
+  // 分页获取游记数据
   const fetchDiaries = useCallback(async (pageNum = 1, isRefresh = false) => {
-    if (isRefresh) setLoading(true);
-    else setLoadingMore(true);
-
+    if (loading) return;
+    setLoading(true);
     try {
       const res = await Taro.request({
-        url: 'http://localhost:3001/getTravelNotes',
+        url: `http://localhost:3001/getTravelNotes`,
         method: 'GET'
       });
       let data = res.data;
+      // 兼容后端返回格式
       if (Array.isArray(data)) {
         data = data;
       } else if (data && data.data) {
@@ -85,54 +101,26 @@ export default function Index() {
         ...item,
         time: formatTime(item.publishTime)
       }));
-
-      // 分页
+      // 前端分页
       const start = (pageNum - 1) * pageSize;
       const end = start + pageSize;
       const paginatedData = formattedData.slice(start, end);
-
       let newDiaries;
-      if (pageNum === 1 || isRefresh) {
+      if (isRefresh || pageNum === 1) {
         newDiaries = paginatedData;
       } else {
         newDiaries = [...diaries, ...paginatedData];
       }
       setDiaries(newDiaries);
-      filterByCategory(activeCategory, newDiaries);
       setHasMore(end < formattedData.length);
     } catch (error) {
       Taro.showToast({ title: '获取数据失败', icon: 'none' });
       setHasMore(false);
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
     // eslint-disable-next-line
-  }, [activeCategory, diaries, pageSize]);
-
-  // 分类筛选
-  const handleCategoryClick = (index) => {
-    const newCategories = categories.map((item, i) => ({ ...item, active: i === index }));
-    setCategories(newCategories);
-    const selectedCategory = categories[index].name;
-    setActiveCategory(selectedCategory);
-    filterByCategory(selectedCategory, diaries);
-  };
-
-  // 分类过滤
-  const filterByCategory = (category, data = diaries) => {
-    if (category === '全部') {
-      setFilteredDiaries(data);
-    } else {
-      setFilteredDiaries(data.filter(item => item.category === category));
-    }
-  };
-
-  // 加载更多
-  const loadMore = () => {
-    if (loadingMore || !hasMore) return;
-    setPage(prev => prev + 1);
-  };
+  }, [diaries, pageSize, loading]);
 
   // 跳转详情
   const toDetail = (item) => {
@@ -149,10 +137,10 @@ export default function Index() {
     });
   };
 
-  // 滚动到底部
+  // 滚动到底部加载更多
   const handleScrollToLower = () => {
-    if (hasMore && !loadingMore) {
-      loadMore();
+    if (hasMore && !loading) {
+      setPage(prev => prev + 1);
     }
   };
 
@@ -175,76 +163,57 @@ export default function Index() {
       </Swiper>
 
       {/* 搜索框 */}
-      <View className="search-container" onClick={toSearch}>
-        <View className="search-input-container">
+      <View className="search-container" style={{ padding: '15px 20px' }} onClick={toSearch}>
+        <View className="search-input-container" style={{ height: '44px', borderRadius: '22px' }}>
           <Input
             className="search-input"
+            style={{ fontSize: '16px', height: '44px', lineHeight: '44px', paddingLeft: '15px' }}
             placeholder="找找去哪儿玩～"
             disabled
           />
         </View>
       </View>
 
-      {/* 分类Tab */}
-      <View className="list2-head">
-        {categories.map((cat, index) => (
-          <View
-            key={index}
-            className={`mini-head ${cat.active ? 'current' : ''}`}
-            onClick={() => handleCategoryClick(index)}
-          >
-            {cat.name}
-          </View>
-        ))}
-      </View>
-
       {/* 游记列表 */}
-      {loading && page === 1 ? (
-        <View className="loading">加载中...</View>
-      ) : (
-        <ScrollView
-          scrollY
-          className="diary-waterfall"
-          enableFlex
-          onScrollToLower={handleScrollToLower}
-        >
-          <View className="grid-layout">
-            {filteredDiaries.length > 0 ? filteredDiaries.map((item, index) => (
-              <View
-                key={item._id || index}
-                className="diary-item"
-                onClick={() => toDetail(item)}
-              >
-                {item.imgList && item.imgList.length > 0 && (
+      <ScrollView
+        scrollY
+        className="diary-waterfall"
+        enableFlex
+        onScrollToLower={handleScrollToLower}
+      >
+        <View className="grid-layout">
+          {diaries.length > 0 ? diaries.map((item, index) => (
+            <View
+              key={item._id || index}
+              className="diary-item"
+              onClick={() => toDetail(item)}
+            >
+              {item.imgList && item.imgList.length > 0 && (
+                <Image
+                  className="diary-image"
+                  src={item.imgList[0]}
+                  mode="aspectFill"
+                />
+              )}
+              <View className="diary-content">
+                <Text className="diary-title" style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '26px' }}>{item.title}</Text>
+                <View className="user-info">
                   <Image
-                    className="diary-image"
-                    src={item.imgList[0]}
-                    mode="aspectFill"
+                    className="user-avatar"
+                    style={{ width: '34px', height: '34px', borderRadius: '50%' }}
+                    src={item.userInfo?.avatar || avatarImage}
                   />
-                )}
-                <View className="diary-content">
-                  <Text className="diary-title">{item.title}</Text>
-                  <View className="user-info">
-                    <Image
-                      className="user-avatar"
-                      src={item.userInfo?.avatar || avatarImage}
-                    />
-                    <Text className="user-name">{item.userInfo?.username || "用户"}</Text>
-                  </View>
+                  <Text className="user-name" style={{ fontSize: '16px', marginLeft: '8px' }}>{item.userInfo?.username || "用户"}</Text>
                 </View>
               </View>
-            )) : (
-              <View className="empty-state">该分类下暂无游记数据</View>
-            )}
-          </View>
-          {loadingMore && (
-            <View className="loading-more">加载更多...</View>
+            </View>
+          )) : (
+            <View className="empty-state">暂无游记数据</View>
           )}
-          {!hasMore && filteredDiaries.length > 0 && (
-            <View className="no-more-data">没有更多数据了</View>
-          )}
-        </ScrollView>
-      )}
+        </View>
+        {loading && <View className="loading-more">加载中...</View>}
+        {!hasMore && diaries.length > 0 && <View className="no-more-data">没有更多数据了</View>}
+      </ScrollView>
       <View style={{ height: '100px' }}></View>
     </View>
   );

@@ -1,11 +1,14 @@
 import { View, Text, Image, Swiper, SwiperItem, Video, Button } from "@tarojs/components";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Taro from "@tarojs/taro";
 import "./infoDetail.less";
+// 导入分享图标
+import shareIcon from "../../assets/images/fenx.png";
 
 export default function InfoDetail() {
   const [info, setInfo] = useState({});
   const [autoplay] = useState(false);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     const router = Taro.getCurrentInstance();
@@ -57,6 +60,44 @@ export default function InfoDetail() {
     return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   };
 
+  // 预览图片
+  const previewImage = (current) => {
+    if (!info.imgList || info.imgList.length === 0) return;
+    
+    Taro.previewImage({
+      current, // 当前显示图片的链接
+      urls: info.imgList, // 需要预览的图片链接列表
+      success: () => {
+        console.log('预览图片成功');
+      },
+      fail: (err) => {
+        console.error('预览图片失败:', err);
+      }
+    });
+  };
+
+  // 视频全屏播放
+  const handleVideoFullScreen = () => {
+    if (videoRef.current) {
+      // 小程序环境下，使用createVideoContext创建上下文来控制视频
+      try {
+        const videoContext = Taro.createVideoContext('detailVideo');
+        if (videoContext) {
+          videoContext.requestFullScreen({ direction: 0 });
+          console.log('调用视频全屏API');
+        } else {
+          console.log('无法获取视频上下文');
+        }
+      } catch (error) {
+        console.error('请求全屏失败:', error);
+        Taro.showToast({
+          title: '全屏播放功能暂不可用',
+          icon: 'none'
+        });
+      }
+    }
+  };
+
   const handleShare = () => {
     console.log('分享');
   };
@@ -78,6 +119,48 @@ export default function InfoDetail() {
     });
   };
 
+  // 准备轮播图内容，确保视频在第一项
+  const renderSwiperItems = () => {
+    const items = [];
+    
+    // 如果有视频，添加到第一项
+    if (info.video) {
+      items.push(
+        <SwiperItem key="video">
+          <Video
+            id="detailVideo"
+            ref={videoRef}
+            src={info.video}
+            style={{ width: "100%", height: "100%" }}
+            controls
+            showFullscreenBtn
+            showPlayBtn
+            onClick={handleVideoFullScreen}
+            onPlay={() => console.log('视频开始播放')}
+          />
+        </SwiperItem>
+      );
+    }
+    
+    // 添加所有图片
+    if (info.imgList && info.imgList.length > 0) {
+      info.imgList.forEach((item, index) => {
+        items.push(
+          <SwiperItem key={`image-${index}`}>
+            <Image
+              mode="aspectFit"
+              className="banner-image"
+              src={item}
+              onClick={() => previewImage(item)}
+            />
+          </SwiperItem>
+        );
+      });
+    }
+    
+    return items;
+  };
+
   return (
     <View className="body">
       <Swiper
@@ -85,30 +168,18 @@ export default function InfoDetail() {
         indicatorDots
         autoplay={autoplay}
       >
-        {info.imgList?.map((item, index) => (
-          <SwiperItem key={index}>
-            {info.video && index === 0 ? (
-              <Video
-                src={info.video}
-                style={{ width: "100%", height: "100%" }}
-                controls
-              />
-            ) : (
-              <Image
-                mode="aspectFit"
-                className="banner-image"
-                src={item}
-              />
-            )}
-          </SwiperItem>
-        ))}
+        {renderSwiperItems()}
       </Swiper>
 
       <View className="name">{info.title}</View>
 
       <View className="container">
         <View className="date item">
-          <Image className="avatar" src={info.userInfo?.avatar} />
+          <Image 
+            className="avatar" 
+            src={info.userInfo?.avatar} 
+            onClick={() => info.userInfo?.avatar && previewImage(info.userInfo.avatar)}
+          />
         </View>
         <View className="date item">
           <Text className="label">发布时间：</Text>
@@ -129,7 +200,7 @@ export default function InfoDetail() {
             onClick={handleShare}
             style={{ width: "60rpx" }}
             mode="widthFix"
-            src="../../assets/images/fenx.png"
+            src={shareIcon}
           />
           <Button onClick={handleToSuccess}>分享</Button>
         </View>

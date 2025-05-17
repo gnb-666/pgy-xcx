@@ -41,8 +41,8 @@ export default function Search() {
       setSearch(value);
       if (!value) {
         setSearchRes([]);
-        return;
-      }
+      return;
+    }
       // 更新历史
       let log = Taro.getStorageSync('searchLog') || [];
       if (value && (!log.length || log[0] !== value)) {
@@ -107,17 +107,17 @@ export default function Search() {
       {/* 搜索栏 */}
       <View className="search">
         <Image className="search-icon" src={searchIcon} />
-        <Input
+          <Input
           value={_search}
           placeholder="搜索"
           onInput={handleInput}
           type="text"
-          className="search-input"
-        />
+            className="search-input"
+          />
         {_search.length > 0 && (
           <Image className="close-icon" src={closeIcon} onClick={deleteSearch} />
-        )}
-      </View>
+          )}
+        </View>
       {/* 搜索历史 */}
       {search.length === 0 ? (
         <View className="empty-search">
@@ -133,8 +133,8 @@ export default function Search() {
         </View>
       ) : (
         <View className="result-search">
-          {loading ? (
-            <View className="loading">搜索中...</View>
+        {loading ? (
+          <View className="loading">搜索中...</View>
           ) : (
             searchRes.length > 0 ? (
               searchRes.map((item, idx) => (
@@ -143,12 +143,12 @@ export default function Search() {
                   <Image className="search-item-right" src={dayuIcon} />
                 </View>
               ))
-            ) : (
+          ) : (
               <View className="empty-result">未找到相关内容</View>
-            )
+          )
           )}
-        </View>
-      )}
+          </View>
+        )}
     </View>
   );
 } 
