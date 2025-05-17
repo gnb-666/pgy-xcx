@@ -7,7 +7,8 @@ export default {
     'pages/myInfo/myInfo',
     'pages/myPosts/myPosts',
     'pages/infoDetail/infoDetail',
-    'pages/search/index'
+    'pages/search/index',
+    'pages/searchResult/index'
   ],
   window: {
     backgroundTextStyle: 'light',

@@ -8,11 +8,12 @@ export default function InfoDetail() {
   const [autoplay] = useState(false);
 
   useEffect(() => {
-    const params = Taro.getCurrentInstance().router.params;
+    const router = Taro.getCurrentInstance();
+    const params = router?.router?.params || {};
+    const id = params._id;
     console.log('获取到的参数:', params);
-    const _id = params._id;
-    if (_id) {
-      getTravelNoteDetail(_id);
+    if (id) {
+      getTravelNoteDetail(id);
     }
   }, []);
 
@@ -63,6 +64,17 @@ export default function InfoDetail() {
   const handleToSuccess = () => {
     Taro.navigateTo({
       url: "/pages/share/share"
+    });
+  };
+
+  const toDetail = (item) => {
+    console.log('首页点击item', item);
+    if (!item._id) {
+      Taro.showToast({ title: '无效的游记ID', icon: 'none' });
+      return;
+    }
+    Taro.navigateTo({
+      url: `/pages/infoDetail/infoDetail?_id=${item._id}`
     });
   };
 
