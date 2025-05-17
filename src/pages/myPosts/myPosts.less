@@ -53,6 +53,7 @@
   margin-bottom: 16rpx;
   padding: 20rpx;
   display: flex;
+  flex-direction: column;
   position: relative;
 }
 
@@ -65,9 +66,8 @@
 }
 
 .my-card-content-wrapper {
-  flex: 1;
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
 }
 
 .my-card-left {
@@ -114,15 +114,15 @@
 .my-card-right {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  width: 120rpx;
+  flex: 1;
+  justify-content: space-between;
 }
 
 .my-card-btns {
   display: flex;
   flex-direction: column;
   gap: 16rpx;
+  align-items: flex-end;
 }
 
 .btn-delete, .btn-edit {
@@ -201,4 +201,30 @@
   width: 40rpx;
   height: 40rpx;
   margin-right: 12rpx;
+}
+
+.reject-reason {
+  color: #ff4d4f;
+  font-size: 24rpx;
+  margin-top: 8rpx;
+  word-break: break-all;
+}
+
+.add-note-btn-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24rpx;
+}
+
+.add-note-btn {
+  background: #07c160;
+  color: #fff;
+  font-size: 32rpx;
+  padding: 8rpx 0;
+  border-radius: 8rpx;
+  border: none;
+  width: 80%;
+  min-width: 300rpx;
+  max-width: 600rpx;
 } 

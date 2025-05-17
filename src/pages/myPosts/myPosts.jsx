@@ -122,21 +122,25 @@ export default function MyPosts() {
 
   return (
     <View className="body">
+      {/* 新增日记按钮 */}
+      <View className="add-note-btn-wrapper">
+        <Button className="add-note-btn" onClick={() => Taro.switchTab({ url: '/pages/publish/publish' })}>
+          新增日记
+        </Button>
+      </View>
       <View className="lose-list">
         {list.map((item) => (
           <View key={item._id} className="my-card" onClick={() => toDetail(item)}>
-            {item.imgList && item.imgList.length > 0 && (
-              <Image src={item.imgList[0]} className="my-card-img" mode="aspectFill" />
-            )}
             <View className="my-card-content-wrapper">
-              <View className="my-card-left">
+              {item.imgList && item.imgList.length > 0 && (
+                <Image src={item.imgList[0]} className="my-card-img" mode="aspectFill" />
+              )}
+              <View className="my-card-right">
                 <View className="my-card-title-row">
                   <View className="my-card-title">{item.title}</View>
                   <View className="my-card-time">{item.time}</View>
                 </View>
                 <View className="my-card-content">{item.content}</View>
-              </View>
-              <View className="my-card-right">
                 <View className="my-card-btns">
                   <Button className="btn-edit" onClick={(e) => { e.stopPropagation(); handleUpdate(item); }}>编辑</Button>
                   <Button className="btn-delete" onClick={(e) => { e.stopPropagation(); handleDelete(item._id); }}>删除</Button>
@@ -148,6 +152,9 @@ export default function MyPosts() {
               {item.state === 2 && <Text className="status-fail">已驳回</Text>}
               {item.state === 0 && <Text className="status-wait">待审核</Text>}
             </View>
+            {item.state === 2 && item.rejectReason && (
+              <View className="reject-reason">驳回原因：{item.rejectReason}</View>
+            )}
           </View>
         ))}
       </View>

@@ -108,6 +108,10 @@ export default function Publish() {
       Taro.showToast({ title: '标题和内容不能为空!', icon: 'none' });
       return;
     }
+    if (!imgList || imgList.length === 0) {
+      Taro.showToast({ title: '请上传至少一张图片!', icon: 'none' });
+      return;
+    }
     setLoading(true);
     try {
       const userInfo = Taro.getStorageSync('userInfo');
@@ -132,12 +136,14 @@ export default function Publish() {
         setVideoUrl('');
         setInfo(null);
         
-        Taro.showToast({ title: info ? '修改成功!' : '发布成功!', icon: 'none' });
-        setTimeout(() => {
-          Taro.switchTab({
+        const goToMyPosts = () => {
+          Taro.navigateTo({
             url: '/pages/myPosts/myPosts'
           });
-        }, 1000);
+        };
+
+        Taro.showToast({ title: info ? '修改成功!' : '发布成功!', icon: 'none' });
+        setTimeout(goToMyPosts, 1000);
       } else {
         Taro.showToast({ title: info ? '修改失败!' : '发布失败!', icon: 'none' });
       }
@@ -168,7 +174,7 @@ export default function Publish() {
           {videoUrl && (
             <View>
               <Video src={videoUrl} controls />
-              <Image src={closeIcon} className="delete-video" style={{ width: '30px' }} onClick={deleteVideo} />
+              <Image src={closeIcon} className="delete-video-btn" mode="aspectFit" onClick={deleteVideo} />
             </View>
           )}
         </View>
