@@ -2,8 +2,6 @@ import { View, Text, Image, Swiper, SwiperItem, Video, Button } from "@tarojs/co
 import { useState, useEffect, useRef } from "react";
 import Taro from "@tarojs/taro";
 import "./infoDetail.less";
-// 导入分享图标
-import shareIcon from "../../assets/images/fenx.png";
 
 export default function InfoDetail() {
   const [info, setInfo] = useState({});
@@ -104,7 +102,7 @@ export default function InfoDetail() {
 
   const handleToSuccess = () => {
     Taro.navigateTo({
-      url: "/pages/share/share"
+      url: "/pages/share/share?type=share"
     });
   };
 
@@ -171,39 +169,35 @@ export default function InfoDetail() {
         {renderSwiperItems()}
       </Swiper>
 
-      <View className="name">{info.title}</View>
-
-      <View className="container">
-        <View className="date item">
+      <View className="info-header">
+        <View className="user-section">
           <Image 
             className="avatar" 
             src={info.userInfo?.avatar} 
             onClick={() => info.userInfo?.avatar && previewImage(info.userInfo.avatar)}
           />
+          <Button className="share-btn" onClick={handleToSuccess}>分享</Button>
         </View>
-        <View className="date item">
-          <Text className="label">发布时间：</Text>
-          <Text>{info.publishTime}</Text>
+        
+        <View className="user-info">
+          <View className="info-item">
+            <Text className="label">发布人：</Text>
+            <Text>{info.userInfo?.username}</Text>
+          </View>
+          
+          <View className="info-item">
+            <Text className="label">发布时间：</Text>
+            <Text>{info.publishTime}</Text>
+          </View>
         </View>
-        <View className="date item">
-          <Text className="label">发布人：</Text>
-          <Text>{info.userInfo?.username}</Text>
-        </View>
-        <View className="date item">
-          <Text className="label">发布内容：</Text>
-          <View className="desc">{info.content}</View>
-        </View>
+      </View>
 
-        <View className="date item">
-          <Text className="label">分享：</Text>
-          <Image
-            onClick={handleShare}
-            style={{ width: "60rpx" }}
-            mode="widthFix"
-            src={shareIcon}
-          />
-          <Button onClick={handleToSuccess}>分享</Button>
-        </View>
+      <View className="title-section">
+        <Text>{info.title}</Text>
+      </View>
+
+      <View className="content-section">
+        <View className="desc">{info.content}</View>
       </View>
     </View>
   );

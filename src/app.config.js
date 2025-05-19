@@ -7,6 +7,7 @@ export default {
     'pages/myInfo/myInfo',
     'pages/myPosts/myPosts',
     'pages/infoDetail/infoDetail',
+    'pages/share/share',
     'pages/search/index',
     'pages/searchResult/index'
   ],
