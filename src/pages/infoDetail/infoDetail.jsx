@@ -3,20 +3,56 @@ import { useState, useEffect, useRef } from "react";
 import Taro from "@tarojs/taro";
 import "./infoDetail.less";
 
+// 使用definePageConfig定义页面配置
+definePageConfig({
+  navigationBarTitleText: '游记详情',
+  navigationBarBackgroundColor: '#ffffff',
+  navigationBarTextStyle: 'black',
+  enablePullDownRefresh: false,
+  navigationStyle: 'default'
+});
+
 export default function InfoDetail() {
   const [info, setInfo] = useState({});
   const [autoplay] = useState(false);
   const videoRef = useRef(null);
+  const [fromPage, setFromPage] = useState('');
 
   useEffect(() => {
     const router = Taro.getCurrentInstance();
     const params = router?.router?.params || {};
     const id = params._id;
+    const from = params.from; // 获取来源页面
+    setFromPage(from);
     console.log('获取到的参数:', params);
     if (id) {
       getTravelNoteDetail(id);
     }
   }, []);
+
+  // 返回上一页
+  const handleBack = () => {
+    if (fromPage === 'myPosts') {
+      // 如果是从我的发布页面来的，返回到我的发布页面
+      Taro.navigateBack({
+        delta: 1
+      });
+    } else {
+      // 如果是从首页来的，返回到首页
+      Taro.navigateBack({
+        delta: 1
+      });
+    }
+  };
+
+  // 在页面显示时设置返回按钮行为
+  Taro.useDidShow(() => {
+    // 设置返回按钮行为
+    Taro.setNavigationBarColor({
+      frontColor: '#000000',
+      backgroundColor: '#ffffff'
+    });
+  });
 
   const getTravelNoteDetail = async (_id) => {
     try {
@@ -161,6 +197,7 @@ export default function InfoDetail() {
 
   return (
     <View className="body">
+      <View className="back-btn" onClick={handleBack}></View>
       <Swiper
         className="banner"
         indicatorDots
@@ -186,15 +223,15 @@ export default function InfoDetail() {
           </View>
           
           <View className="info-item">
-            <Text className="label">发布时间：</Text>
-            <Text>{info.publishTime}</Text>
-          </View>
+          <Text className="label">发布时间：</Text>
+          <Text>{info.publishTime}</Text>
         </View>
-      </View>
+        </View>
+        </View>
 
       <View className="title-section">
         <Text>{info.title}</Text>
-      </View>
+        </View>
 
       <View className="content-section">
         <View className="desc">{info.content}</View>
