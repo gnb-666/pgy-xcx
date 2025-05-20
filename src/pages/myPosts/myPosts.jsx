@@ -24,6 +24,8 @@ export default function MyPosts() {
         console.error('用户信息不存在');
         return;
       }
+      // 延迟0.5秒再发起请求
+      await new Promise(resolve => setTimeout(resolve, 500));
       const res = await Taro.request({
         url: 'http://localhost:3001/getMyPublish',
         method: 'GET',

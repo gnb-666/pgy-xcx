@@ -32,17 +32,9 @@ export default function InfoDetail() {
 
   // 返回上一页
   const handleBack = () => {
-    if (fromPage === 'myPosts') {
-      // 如果是从我的发布页面来的，返回到我的发布页面
-      Taro.navigateBack({
-        delta: 1
-      });
-    } else {
-      // 如果是从首页来的，返回到首页
-      Taro.navigateBack({
-        delta: 1
-      });
-    }
+    Taro.navigateBack({
+      delta: 1
+    });
   };
 
   // 在页面显示时设置返回按钮行为
